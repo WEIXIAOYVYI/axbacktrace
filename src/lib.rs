@@ -133,6 +133,27 @@ pub struct Backtrace {
 }
 
 impl Backtrace {
+    /// Capture a backtrace from a given frame pointer.
+    ///
+    /// # Safety
+    /// The provided `fp` must be a valid frame pointer in stack.
+    pub fn capture_from_fp(fp: usize) -> Self {
+        #[cfg(not(feature = "dwarf"))]
+        {
+            Self {
+                inner: Inner::Disabled,
+            }
+        }
+        #[cfg(feature = "dwarf")]
+        {
+            let frames = unwind_stack(fp);
+            core::hint::black_box(());
+            Self {
+                inner: Inner::Captured(frames),
+            }
+        }
+    }
+
     /// Capture the current thread's stack backtrace.
     pub fn capture() -> Self {
         #[cfg(not(feature = "dwarf"))]
