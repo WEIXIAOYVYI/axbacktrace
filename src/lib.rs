@@ -147,7 +147,6 @@ impl Backtrace {
         #[cfg(feature = "dwarf")]
         {
             let frames = unwind_stack(fp);
-            core::hint::black_box(());
             Self {
                 inner: Inner::Captured(frames),
             }
